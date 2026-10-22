@@ -1,0 +1,18 @@
+{
+  "id": "./",
+  "name": "PhraseCraft — Malayalam Hindi Gujarati",
+  "short_name": "PhraseCraft",
+  "description": "Everyday Manglish and English translation with Malayalam, Hindi, Gujarati, pronunciation, and word-by-word meanings.",
+  "lang": "en",
+  "start_url": "./",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0b0d12",
+  "theme_color": "#0b0d12",
+  "categories": [
+    "education",
+    "utilities",
+    "productivity"
+  ]
+}
