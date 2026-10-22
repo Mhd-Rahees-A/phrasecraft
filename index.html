@@ -311,36 +311,40 @@ Rules:
           sourceText.focus();
           return;
         }
-        const key = getSavedKey();
-        if (!key) {
-          setStatus('Add your OpenAI API key in Settings before processing.', 'error');
-          openSettings();
-          return;
-        }
-        if (!navigator.onLine) {
-          setStatus('You are offline. The app shell can open offline, but translation needs an internet connection.', 'error');
-          return;
-        }
 
-        setBusy(true);
-        setStatus('Translating and preparing the word-by-word explanation…');
-        try {
-          const model = (localStorage.getItem(MODEL_STORAGE) || DEFAULT_MODEL).trim() || DEFAULT_MODEL;
-          const response = await fetch('https://api.openai.com/v1/chat/completions', {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              'Authorization': 'Bearer ' + key
-            },
-            body: JSON.stringify({
-              model,
-              messages: [
-                { role: 'system', content: SYSTEM_PROMPT },
-                { role: 'user', content: sentence }
-              ],
-              temperature: 0.2
-            })
-          });
+
+        const key = getSavedKey();
+        const isOpenRouter = key.startsWith('sk-or-');
+        const endpoint = isOpenRouter 
+          ? 'https://openrouter.ai/api/v1/chat/completions' 
+          : 'https://api.openai.com/v1/chat/completions';
+        
+        const headers = {
+          'Content-Type': 'application/json',
+          'Authorization': 'Bearer ' + key
+        };
+        
+        // OpenRouter recommended headers (optional, but good practice)
+        if (isOpenRouter) {
+          headers['HTTP-Referer'] = window.location.origin;
+          headers['X-Title'] = 'PhraseCraft';
+        }
+        
+        const response = await fetch(endpoint, {
+          method: 'POST',
+          headers: headers,
+          body: JSON.stringify({
+            model: (localStorage.getItem(MODEL_STORAGE) || (isOpenRouter ? 'google/gemini-flash-1.5' : DEFAULT_MODEL)).trim(),
+            messages: [
+              { role: 'system', content: SYSTEM_PROMPT },
+              { role: 'user', content: sentence }
+            ],
+            temperature: 0.2
+          })
+        });
+
+
+
 
           let data;
           try { data = await response.json(); }
